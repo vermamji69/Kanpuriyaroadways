@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>कानपुरिया रोडवेज</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #05080c;
+      color: #fff;
+      font-family: sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      position: relative;
+    }
+
+    /* आसमान और कड़कती बिजली */
+    #sky {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 60vh;
+      background: linear-gradient(to bottom, #020305, #0d1520);
+      z-index: 1;
+    }
+    #lightning {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      opacity: 0;
+      z-index: 2;
+      pointer-events: none;
+      transition: opacity 0.05s ease;
+    }
+    .flash { opacity: 1 !important; }
+
+    /* तेज बारिश */
+    #rain-canvas {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .drop {
+      position: absolute;
+      background: linear-gradient(transparent, rgba(255, 255, 255, 0.8));
+      width: 2px;
+      height: 30px;
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      0% { transform: translateY(-30px) translateX(0) rotate(-15deg); }
+      100% { transform: translateY(100vh) translateX(-120px) rotate(-15deg); }
+    }
+
+    /* हवा से हिलते पेड़ */
+    .tree-line {
+      position: absolute;
+      bottom: 35vh;
+      width: 100%;
+      height: 80px;
+      display: flex;
+      justify-content: space-around;
+      z-index: 4;
+    }
+    .tree {
+      width: 0; height: 0;
+      border-left: 25px solid transparent;
+      border-right: 25px solid transparent;
+      border-bottom: 70px solid #112d16;
+      position: relative;
+      transform-origin: bottom center;
+      animation: sway 1.8s ease-in-out infinite alternate;
+    }
+    @keyframes sway {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(-10deg); }
+    }
+
+    /* सड़क */
+    #road {
+      position: absolute;
+      bottom: 0; width: 100%; height: 35vh;
+      background: #151515;
+      border-top: 4px solid #333;
+      z-index: 5;
+      overflow: hidden;
+    }
+    .lane-mark {
+      position: absolute;
+      top: 50%;
+      width: 50px; height: 6px;
+      background: #e67e22;
+      animation: roadMove 0.5s linear infinite;
+    }
+    @keyframes roadMove {
+      0% { left: 100%; }
+      100% { left: -80px; }
+    }
+
+    /* बस और सवारियां (Passengers) */
+    .bus {
+      position: absolute;
+      bottom: 35px; left: 50px;
+      width: 230px; height: 95px;
+      background: #c0392b;
+      border-radius: 12px 25px 4px 4px;
+      z-index: 10;
+    }
+    .bus-top {
+      position: absolute; top: 0; width: 100%; height: 12px;
+      background: #f1c40f; border-radius: 12px 25px 0 0;
+    }
+    .windows {
+      position: absolute; top: 22px; left: 15px;
+      display: flex; gap: 8px;
+    }
+    .window {
+      width: 40px; height: 32px;
+      background: #5dade2;
+      border: 2px solid #222;
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+    .passenger {
+      position: absolute; bottom: 0; left: 10px;
+      width: 16px; height: 18px;
+      background: #111;
+      border-radius: 8px 8px 0 0;
+    }
+    .passenger::before {
+      content: ''; position: absolute; top: -7px; left: 3px;
+      width: 10px; height: 10px; background: #111; border-radius: 50%;
+    }
+    .headlight {
+      position: absolute; bottom: 15px; right: 0;
+      width: 10px; height: 15px; background: #fff;
+      box-shadow: 30px 0 50px 20px rgba(255, 255, 255, 0.9);
+    }
+    .wheel {
+      position: absolute; bottom: -12px;
+      width: 32px; height: 32px; background: #222;
+      border: 4px solid #888; border-radius: 50%;
+      animation: spin 0.2s linear infinite;
+    }
+    .wheel.front { right: 25px; }
+    .wheel.back { left: 25px; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    /* सुधरी हुई गाड़ियां (Proper Scaled Traffic) */
+    .traffic {
+      position: absolute;
+      bottom: 25px;
+      z-index: 9;
+      animation: drive linear infinite;
+    }
+    .car {
+      width: 80px; height: 32px; background: #2980b9;
+      border-radius: 8px 12px 2px 2px;
+    }
+    .auto {
+      width: 55px; height: 40px; background: #f39c12;
+      border-radius: 4px 8px 0 0;
+    }
+    .bike {
+      width: 35px; height: 22px; background: #e74c3c;
+      border-radius: 4px;
+    }
+    @keyframes drive {
+      0% { left: -100px; }
+      100% { left: 110vw; }
+    }
+
+    /* हेडर और यूट्यूब म्यूज़िक प्लेयर */
+    #top-bar {
+      position: absolute;
+      top: 10px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      width: 90%; max-width: 380px;
+      background: rgba(10, 15, 25, 0.9);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+    }
+    h1.title {
+      font-size: 22px;
+      color: #f1c40f;
+      margin-bottom: 6px;
+    }
+    .horn-btn {
+      background: #e74c3c; color: #fff; border: none;
+      padding: 6px 12px; font-weight: bold; border-radius: 15px;
+      cursor: pointer; margin-bottom: 8px; font-size: 12px;
+    }
+    .yt-container {
+      width: 100%; height: 90px;
+      border-radius: 8px; overflow: hidden;
+    }
+    iframe { width: 100%; height: 100%; border: none; }
+
+    /* स्टार्टअप स्क्रीन */
+    #start-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: #080a0f;
+      z-index: 100; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; text-align: center;
+    }
+    #start-overlay h2 { font-size: 28px; color: #f1c40f; margin-bottom: 10px; }
+    .start-btn {
+      padding: 12px 28px; font-size: 16px; font-weight: bold;
+      color: #fff; background: #e74c3c;
+      border: none; border-radius: 25px; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="start-overlay">
+    <h2>कानपुरिया रोडवेज</h2>
+    <p style="margin-bottom:20px; color:#aaa;">सफर चालू करने के लिए बटन दबाएं</p>
+    <button class="start-btn" onclick="startJourney()">START JOURNEY (चालू करें)</button>
+  </div>
+
+  <div id="sky"></div>
+  <div id="lightning"></div>
+  <div id="rain-canvas"></div>
+
+  <div class="tree-line">
+    <div class="tree"></div><div class="tree"></div>
+    <div class="tree"></div><div class="tree"></div>
+  </div>
+
+  <div id="road">
+    <div class="lane-mark" style="left:20%;"></div>
+    <div class="lane-mark" style="left:60%;"></div>
+    
+    <div class="bus">
+      <div class="bus-top"></div>
+      <div class="windows">
+        <div class="window"><div class="passenger"></div></div>
+        <div class="window"><div class="passenger"></div></div>
+        <div class="window"><div class="passenger"></div></div>
+        <div class="window"><div class="passenger"></div></div>
+      </div>
+      <div class="headlight"></div>
+      <div class="wheel back"></div>
+      <div class="wheel front"></div>
+    </div>
+
+    <div id="traffic-container"></div>
+  </div>
+
+  <div id="top-bar">
+    <h1 class="title">कानपुरिया रोडवेज</h1>
+    <button class="horn-btn" onclick="playPoPoHorn()">🔊 BASS HORN (पो-पो)</button>
+    
+    <!-- आपकी यूट्यूब प्लेलिस्ट का प्लेयर -->
+    <div class="yt-container">
+      <iframe src="https://www.youtube.com/embed/videoseries?list=PLq-bT4s33RYADNkcClDkLPovaKJx0HTDM&autoplay=1" allow="autoplay"></iframe>
+    </div>
+  </div>
+
+  <script>
+    // बारिश का कोड
+    const rainContainer = document.getElementById('rain-canvas');
+    for (let i = 0; i < 150; i++) {
+      const drop = document.createElement('div');
+      drop.className = 'drop';
+      drop.style.left = Math.random() * 100 + 'vw';
+      drop.style.animationDuration = (Math.random() * 0.3 + 0.2) + 's';
+      drop.style.animationDelay = (Math.random() * 2) + 's';
+      rainContainer.appendChild(drop);
+    }
+
+    // बिजली कड़कने का साउंड व इफ़ेक्ट
+    setInterval(() => {
+      if (Math.random() > 0.4) {
+        const flash = document.getElementById('lightning');
+        flash.classList.add('flash');
+        playThunderSound();
+        setTimeout(() => flash.classList.remove('flash'), 100);
+      }
+    }, 3000);
+
+    // ऑटो, बाइक और कार का ट्रैफिक
+    function spawnTraffic() {
+      const container = document.getElementById('traffic-container');
+      const types = ['car', 'auto', 'bike'];
+      const chosen = types[Math.floor(Math.random() * types.length)];
+      
+      const vehicle = document.createElement('div');
+      vehicle.className = `traffic ${chosen}`;
+      vehicle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+      
+      container.appendChild(vehicle);
+      setTimeout(() => vehicle.remove(), 6000);
+    }
+    setInterval(spawnTraffic, 3000);
+
+    function startJourney() {
+      document.getElementById('start-overlay').style.display = 'none';
+      playPoPoHorn();
+    }
+
+    function playPoPoHorn() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(420, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.4);
+        gain.gain.setValueAtTime(0.5, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.4);
+      } catch(e){}
+    }
+
+    function playThunderSound() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(60, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(20, ctx.currentTime + 1.2);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.2);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 1.2);
+      } catch(e){}
+    }
+  </script>
+</body>
+</html>
+
