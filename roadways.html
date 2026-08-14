@@ -6,26 +6,26 @@
   <title>कानपुरिया रोडवेज</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
+    html, body {
+      width: 100%; height: 100vh;
+      overflow: hidden;
       background: #05080c;
       color: #fff;
       font-family: sans-serif;
-      overflow: hidden;
-      height: 100vh;
       position: relative;
     }
 
     /* आसमान और कड़कती बिजली */
     #sky {
       position: absolute;
-      top: 0; left: 0; width: 100%; height: 60vh;
+      top: 0; left: 0; width: 100%; height: 55vh;
       background: linear-gradient(to bottom, #020305, #0d1520);
       z-index: 1;
     }
     #lightning {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.95);
       opacity: 0;
       z-index: 2;
       pointer-events: none;
@@ -44,7 +44,7 @@
       position: absolute;
       background: linear-gradient(transparent, rgba(255, 255, 255, 0.8));
       width: 2px;
-      height: 30px;
+      height: 28px;
       animation: fall linear infinite;
     }
     @keyframes fall {
@@ -55,9 +55,9 @@
     /* हवा से हिलते पेड़ */
     .tree-line {
       position: absolute;
-      bottom: 35vh;
+      bottom: 45vh;
       width: 100%;
-      height: 80px;
+      height: 90px;
       display: flex;
       justify-content: space-around;
       z-index: 4;
@@ -66,56 +66,57 @@
       width: 0; height: 0;
       border-left: 25px solid transparent;
       border-right: 25px solid transparent;
-      border-bottom: 70px solid #112d16;
+      border-bottom: 75px solid #14381a;
       position: relative;
       transform-origin: bottom center;
-      animation: sway 1.8s ease-in-out infinite alternate;
+      animation: sway 1.5s ease-in-out infinite alternate;
     }
     @keyframes sway {
       0% { transform: rotate(0deg); }
-      100% { transform: rotate(-10deg); }
+      100% { transform: rotate(-8deg); }
     }
 
     /* सड़क */
     #road {
       position: absolute;
-      bottom: 0; width: 100%; height: 35vh;
-      background: #151515;
-      border-top: 4px solid #333;
+      bottom: 0; width: 100%; height: 45vh;
+      background: #181818;
+      border-top: 5px solid #333;
       z-index: 5;
       overflow: hidden;
     }
     .lane-mark {
       position: absolute;
       top: 50%;
-      width: 50px; height: 6px;
-      background: #e67e22;
-      animation: roadMove 0.5s linear infinite;
+      width: 60px; height: 6px;
+      background: #f1c40f;
+      animation: roadMove 0.6s linear infinite;
     }
     @keyframes roadMove {
       0% { left: 100%; }
       100% { left: -80px; }
     }
 
-    /* बस और सवारियां (Passengers) */
+    /* बस और सवारियां (Proper Positioned Bus) */
     .bus {
       position: absolute;
-      bottom: 35px; left: 50px;
-      width: 230px; height: 95px;
+      bottom: 60px; left: 30px;
+      width: 240px; height: 100px;
       background: #c0392b;
       border-radius: 12px 25px 4px 4px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.6);
       z-index: 10;
     }
     .bus-top {
-      position: absolute; top: 0; width: 100%; height: 12px;
+      position: absolute; top: 0; width: 100%; height: 14px;
       background: #f1c40f; border-radius: 12px 25px 0 0;
     }
     .windows {
-      position: absolute; top: 22px; left: 15px;
+      position: absolute; top: 24px; left: 15px;
       display: flex; gap: 8px;
     }
     .window {
-      width: 40px; height: 32px;
+      width: 42px; height: 35px;
       background: #5dade2;
       border: 2px solid #222;
       border-radius: 4px;
@@ -123,8 +124,8 @@
       overflow: hidden;
     }
     .passenger {
-      position: absolute; bottom: 0; left: 10px;
-      width: 16px; height: 18px;
+      position: absolute; bottom: 0; left: 12px;
+      width: 16px; height: 20px;
       background: #111;
       border-radius: 8px 8px 0 0;
     }
@@ -134,36 +135,36 @@
     }
     .headlight {
       position: absolute; bottom: 15px; right: 0;
-      width: 10px; height: 15px; background: #fff;
-      box-shadow: 30px 0 50px 20px rgba(255, 255, 255, 0.9);
+      width: 12px; height: 18px; background: #fff;
+      box-shadow: 35px 0 60px 25px rgba(255, 255, 255, 0.95);
     }
     .wheel {
-      position: absolute; bottom: -12px;
-      width: 32px; height: 32px; background: #222;
+      position: absolute; bottom: -14px;
+      width: 36px; height: 36px; background: #222;
       border: 4px solid #888; border-radius: 50%;
-      animation: spin 0.2s linear infinite;
+      animation: spin 0.25s linear infinite;
     }
     .wheel.front { right: 25px; }
     .wheel.back { left: 25px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    /* सुधरी हुई गाड़ियां (Proper Scaled Traffic) */
+    /* गाड़ियां (Proper Traffic) */
     .traffic {
       position: absolute;
-      bottom: 25px;
+      bottom: 40px;
       z-index: 9;
       animation: drive linear infinite;
     }
     .car {
-      width: 80px; height: 32px; background: #2980b9;
+      width: 85px; height: 35px; background: #2980b9;
       border-radius: 8px 12px 2px 2px;
     }
     .auto {
-      width: 55px; height: 40px; background: #f39c12;
+      width: 60px; height: 42px; background: #f39c12;
       border-radius: 4px 8px 0 0;
     }
     .bike {
-      width: 35px; height: 22px; background: #e74c3c;
+      width: 40px; height: 25px; background: #e74c3c;
       border-radius: 4px;
     }
     @keyframes drive {
@@ -171,34 +172,42 @@
       100% { left: 110vw; }
     }
 
-    /* हेडर और यूट्यूब म्यूज़िक प्लेयर */
+    /* हेडर और सिर्फ ऑडियो म्यूजिक प्लेयर (Video Hidden) */
     #top-bar {
       position: absolute;
-      top: 10px; left: 50%;
+      top: 15px; left: 50%;
       transform: translateX(-50%);
       z-index: 20;
-      width: 90%; max-width: 380px;
-      background: rgba(10, 15, 25, 0.9);
+      width: 90%; max-width: 360px;
+      background: rgba(10, 15, 25, 0.92);
       border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 12px;
-      padding: 10px;
+      border-radius: 15px;
+      padding: 12px;
       text-align: center;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.7);
     }
     h1.title {
       font-size: 22px;
       color: #f1c40f;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
     .horn-btn {
       background: #e74c3c; color: #fff; border: none;
-      padding: 6px 12px; font-weight: bold; border-radius: 15px;
-      cursor: pointer; margin-bottom: 8px; font-size: 12px;
+      padding: 8px 16px; font-weight: bold; border-radius: 20px;
+      cursor: pointer; margin-bottom: 10px; font-size: 13px;
     }
-    .yt-container {
-      width: 100%; height: 90px;
+    /* Video Hide Hack for Clean Audio Feel */
+    .yt-audio-only {
+      width: 100%; height: 50px;
       border-radius: 8px; overflow: hidden;
+      background: #111;
+      position: relative;
     }
-    iframe { width: 100%; height: 100%; border: none; }
+    .yt-audio-only iframe {
+      width: 100%; height: 200px;
+      margin-top: -100px; /* Hides video frame, keeps controls active */
+      border: none;
+    }
 
     /* स्टार्टअप स्क्रीन */
     #start-overlay {
@@ -233,9 +242,11 @@
   </div>
 
   <div id="road">
-    <div class="lane-mark" style="left:20%;"></div>
-    <div class="lane-mark" style="left:60%;"></div>
+    <div class="lane-mark" style="left:10%;"></div>
+    <div class="lane-mark" style="left:50%;"></div>
+    <div class="lane-mark" style="left:90%;"></div>
     
+    <!-- Bus with Passengers -->
     <div class="bus">
       <div class="bus-top"></div>
       <div class="windows">
@@ -256,16 +267,16 @@
     <h1 class="title">कानपुरिया रोडवेज</h1>
     <button class="horn-btn" onclick="playPoPoHorn()">🔊 BASS HORN (पो-पो)</button>
     
-    <!-- आपकी यूट्यूब प्लेलिस्ट का प्लेयर -->
-    <div class="yt-container">
+    <!-- Audio-Only View Player -->
+    <div class="yt-audio-only">
       <iframe src="https://www.youtube.com/embed/videoseries?list=PLq-bT4s33RYADNkcClDkLPovaKJx0HTDM&autoplay=1" allow="autoplay"></iframe>
     </div>
   </div>
 
   <script>
-    // बारिश का कोड
+    // तेज बारिश
     const rainContainer = document.getElementById('rain-canvas');
-    for (let i = 0; i < 150; i++) {
+    for (let i = 0; i < 160; i++) {
       const drop = document.createElement('div');
       drop.className = 'drop';
       drop.style.left = Math.random() * 100 + 'vw';
@@ -274,7 +285,7 @@
       rainContainer.appendChild(drop);
     }
 
-    // बिजली कड़कने का साउंड व इफ़ेक्ट
+    // बिजली कड़कना
     setInterval(() => {
       if (Math.random() > 0.4) {
         const flash = document.getElementById('lightning');
@@ -282,9 +293,9 @@
         playThunderSound();
         setTimeout(() => flash.classList.remove('flash'), 100);
       }
-    }, 3000);
+    }, 3500);
 
-    // ऑटो, बाइक और कार का ट्रैफिक
+    // ट्रैफिक
     function spawnTraffic() {
       const container = document.getElementById('traffic-container');
       const types = ['car', 'auto', 'bike'];
@@ -292,12 +303,12 @@
       
       const vehicle = document.createElement('div');
       vehicle.className = `traffic ${chosen}`;
-      vehicle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+      vehicle.style.animationDuration = (Math.random() * 3 + 4) + 's';
       
       container.appendChild(vehicle);
-      setTimeout(() => vehicle.remove(), 6000);
+      setTimeout(() => vehicle.remove(), 7000);
     }
-    setInterval(spawnTraffic, 3000);
+    setInterval(spawnTraffic, 4000);
 
     function startJourney() {
       document.getElementById('start-overlay').style.display = 'none';
@@ -340,4 +351,3 @@
   </script>
 </body>
 </html>
-
