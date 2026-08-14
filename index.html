@@ -1,614 +1,340 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Kanpuria Roadways Express</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>कानपुरिया रोडवेज</title>
   <style>
-    html, body {
-      background-color: #02050a;
-      color: white;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #080c10;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       overflow: hidden;
-      margin: 0;
-      padding: 0;
-      width: 100vw;
-      height: 100dvh;
-      font-family: system-ui, -apple-system, sans-serif;
-      touch-action: none;
-      overscroll-behavior: none;
+      height: 100vh;
+      position: relative;
     }
 
-    /* Start Screen Overlay (To unlock Audio & Animations) */
-    #start-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(2, 5, 10, 0.95);
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 20px;
+    /* Background & Lightning */
+    #sky {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 60vh;
+      background: linear-gradient(to bottom, #020406, #111a24);
+      z-index: 1;
     }
-    .start-btn {
-      background: linear-gradient(to bottom, #ffcc00, #ff0000);
-      color: white;
-      border: none;
-      padding: 15px 40px;
-      font-size: 1.5rem;
-      font-weight: 900;
-      border-radius: 50px;
-      cursor: pointer;
-      box-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
-      margin-top: 20px;
-    }
-
-    /* Lightning & Thunder Flash */
-    .lightning-flash {
-      position: fixed;
-      inset: 0;
-      background-color: white;
+    #lightning {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(255, 255, 255, 0.85);
       opacity: 0;
+      z-index: 2;
       pointer-events: none;
-      z-index: 50;
+      transition: opacity 0.05s ease;
     }
-    .flash-active {
-      animation: lightningBlink 0.6s ease-out;
-    }
-    @keyframes lightningBlink {
-      0% { opacity: 0; }
-      10% { opacity: 0.9; }
-      20% { opacity: 0; }
-      30% { opacity: 0.9; }
-      100% { opacity: 0; }
-    }
+    .flash { opacity: 1 !important; }
 
-    /* Rain Canvas Effect */
-    .rain-canvas {
-      position: fixed;
-      inset: 0;
+    /* Heavy Rain */
+    #rain-canvas {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 3;
       pointer-events: none;
-      z-index: 40;
-      overflow: hidden;
     }
     .drop {
       position: absolute;
-      top: -20px;
-      width: 1px;
-      height: 20px;
-      background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.8));
-      animation: rain linear infinite;
+      background: linear-gradient(transparent, rgba(255, 255, 255, 0.7));
+      width: 2px;
+      height: 25px;
+      opacity: 0.7;
+      animation: fall linear infinite;
+      transform: rotate(-15deg); /* Slanted by wind */
     }
-    @keyframes rain {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(100vh); }
+    @keyframes fall {
+      0% { transform: translateY(-30px) translateX(0) rotate(-15deg); }
+      100% { transform: translateY(100vh) translateX(-100px) rotate(-15deg); }
     }
 
-    /* Clouds Banner */
-    .cloud-banner {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 200px;
-      z-index: 15;
-      pointer-events: none;
-    }
-    .dipping-cloud {
+    /* Trees with Wind Animation */
+    .tree-line {
       position: absolute;
-      background: radial-gradient(circle, rgba(200, 230, 255, 0.35) 0%, rgba(255, 255, 255, 0.15) 50%, transparent 80%);
-      border-radius: 50%;
-      filter: blur(35px);
-      animation: moveCloud 30s linear infinite;
-    }
-    @keyframes moveCloud {
-      from { transform: translateX(100vw); }
-      to { transform: translateX(-150vw); }
-    }
-    .dc1 { width: 600px; height: 250px; top: -20px; left: 100%; animation-duration: 35s; }
-    .dc2 { width: 800px; height: 350px; top: -50px; left: 100%; animation-duration: 45s; animation-delay: 15s; }
-
-    /* Flying Airplane */
-    .airplane-wrapper {
-      position: absolute;
-      top: 10vh;
-      left: 100vw;
-      z-index: 14;
-      animation: flyAirplane 40s linear infinite;
-    }
-    @keyframes flyAirplane {
-      0% { transform: translateX(10vw); opacity: 0; }
-      10% { transform: translateX(0); opacity: 0.8; }
-      50% { transform: translateX(-150vw); opacity: 0.8; }
-      100% { transform: translateX(-160vw); opacity: 0; }
-    }
-    .plane-light { animation: strobe 1s infinite alternate; }
-    @keyframes strobe { 0% { opacity: 0.2; } 100% { opacity: 1; filter: drop-shadow(0 0 10px red); } }
-
-    /* UI Navigation & Music Player */
-    .top-nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      padding: 1rem;
+      bottom: 35vh;
+      width: 100%;
+      height: 80px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 100;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-    }
-    .live-status {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-weight: bold;
-      color: #ff3b3b;
-      font-size: 0.875rem;
-    }
-    .green-dot {
-      width: 8px; height: 8px;
-      background-color: #ff3b3b;
-      border-radius: 50%;
-      animation: pulse 1s infinite;
-    }
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
-    .horn-trigger-btn {
-      background-color: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.3);
-      padding: 0.5rem 1rem;
-      border-radius: 9999px;
-      cursor: pointer;
-      backdrop-filter: blur(4px);
-      color: white;
-      font-weight: bold;
-    }
-
-    .top-player-card {
-      position: fixed;
-      top: 4rem; left: 50%;
-      transform: translateX(-50%);
-      background-color: rgba(10, 15, 20, 0.85);
-      border: 1px solid rgba(255,255,255,0.2);
-      padding: 0.5rem 1.25rem;
-      border-radius: 9999px;
-      backdrop-filter: blur(8px);
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      width: 90%;
-      max-width: 450px;
-    }
-    .disc-art {
-      width: 36px; height: 36px;
-      background: linear-gradient(45deg, #1a1a1a, #333);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      animation: spin 3s linear infinite;
-      font-size: 1.25rem; flex-shrink: 0;
-    }
-    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-    .brand-heading-hindi {
-      position: fixed;
-      top: 38vh; left: 50%;
-      transform: translateX(-50%);
-      font-size: 2.8rem;
-      font-weight: 900;
-      background: linear-gradient(to bottom, #ffcc00, #ff0000);
-      -webkit-background-clip: text;
-      color: transparent;
-      text-shadow: 2px 4px 15px rgba(0,0,0,0.8);
-      z-index: 100;
-      white-space: nowrap;
-    }
-
-    /* Background Scenery: Buildings, Trees, Traffic Lights */
-    .viewport-scenery {
-      position: fixed;
-      inset: 0;
-      z-index: 20;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-    }
-
-    /* Buildings Background */
-    .buildings-layer {
-      position: absolute;
-      bottom: 25vh;
-      left: 0; right: 0;
-      height: 180px;
-      z-index: 21;
-    }
-    .building-group {
-      position: absolute;
-      bottom: 0; left: 100vw;
-      display: flex; gap: 15px; align-items: flex-end;
-      animation: moveScenery 25s linear infinite;
-    }
-    .bld {
-      background: #080d1a;
-      border: 1px solid #1a233a;
-      position: relative;
-    }
-    .bld-win {
-      width: 4px; height: 6px; background: #ffcc00; opacity: 0.6; margin: 4px; display: inline-block;
-    }
-    @keyframes moveScenery {
-      from { transform: translateX(0); }
-      to { transform: translateX(-220vw); }
-    }
-
-    /* Trees Layer */
-    .trees-layer {
-      position: absolute;
-      bottom: 25vh;
-      left: 100vw;
-      z-index: 22;
-      display: flex; gap: 120px;
-      animation: moveTrees 15s linear infinite;
-    }
-    @keyframes moveTrees {
-      from { transform: translateX(0); }
-      to { transform: translateX(-200vw); }
+      justify-content: space-around;
+      z-index: 4;
     }
     .tree {
       width: 0; height: 0;
       border-left: 20px solid transparent;
       border-right: 20px solid transparent;
-      border-bottom: 50px solid #0a2f1d;
+      border-bottom: 60px solid #143319;
       position: relative;
+      transform-origin: bottom center;
+      animation: sway 2s ease-in-out infinite alternate;
     }
-    .tree-trunk {
-      position: absolute; bottom: -15px; left: -4px;
-      width: 8px; height: 15px; background: #3d2314;
-    }
-
-    /* Highway Sign Board */
-    .highway-sign-wrapper {
+    .tree::after {
+      content: '';
       position: absolute;
-      bottom: 25vh; left: 100vw;
-      z-index: 25;
-      animation: moveSign 18s linear infinite;
-      display: flex; flex-direction: column; align-items: center;
+      bottom: -70px; left: -6px;
+      width: 12px; height: 10px;
+      background: #2b1810;
     }
-    @keyframes moveSign {
-      from { transform: translateX(0); }
-      to { transform: translateX(-200vw); }
+    @keyframes sway {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(-8deg); }
     }
-    .sign-board-rect {
-      background-color: #0f5132;
-      border: 3px solid #fff;
-      border-radius: 8px;
-      padding: 0.5rem 1.2rem;
-      display: flex; gap: 1rem; color: white; font-weight: bold;
-    }
-    .pole-stick { width: 6px; height: 80px; background-color: #777; }
 
-    /* Traffic Light Signal */
-    .traffic-signal {
+    /* Road */
+    #road {
       position: absolute;
-      bottom: 25vh; left: 100vw;
-      z-index: 26;
-      animation: moveTrafficSignal 20s linear infinite;
-      animation-delay: 5s;
-      display: flex; flex-direction: column; align-items: center;
+      bottom: 0; width: 100%; height: 35vh;
+      background: #1a1a1a;
+      border-top: 5px solid #333;
+      z-index: 5;
+      overflow: hidden;
     }
-    @keyframes moveTrafficSignal {
-      from { transform: translateX(0); }
-      to { transform: translateX(-200vw); }
+    .lane-mark {
+      position: absolute;
+      top: 50%;
+      width: 60px; height: 8px;
+      background: #f1c40f;
+      animation: roadMove 0.6s linear infinite;
     }
-    .signal-box {
-      width: 20px; height: 50px; background: #111; border: 2px solid #444; border-radius: 5px;
-      display: flex; flex-direction: column; align-items: center; justify-content: space-around; padding: 2px 0;
+    @keyframes roadMove {
+      0% { left: 100%; }
+      100% { left: -100px; }
     }
-    .sig-light { width: 10px; height: 10px; border-radius: 50%; opacity: 0.3; }
-    .sig-red { background: red; }
-    .sig-yellow { background: yellow; }
-    .sig-green { background: #00ff00; opacity: 1; box-shadow: 0 0 8px #00ff00; }
 
-    /* Road Strip & Moving Cars */
-    .road-strip {
-      height: 25vh;
-      background: linear-gradient(to bottom, #111, #222);
+    /* Bus Design & Passengers */
+    .bus {
+      position: absolute;
+      bottom: 40px; left: 80px;
+      width: 220px; height: 90px;
+      background: #d32f2f;
+      border-radius: 12px 25px 5px 5px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+      z-index: 10;
+    }
+    .bus-top {
+      position: absolute; top: 0; width: 100%; height: 12px;
+      background: #fbc02d; border-radius: 12px 25px 0 0;
+    }
+    .windows {
+      position: absolute; top: 20px; left: 15px;
+      display: flex; gap: 8px;
+    }
+    .window {
+      width: 38px; height: 30px;
+      background: #81d4fa;
+      border: 2px solid #333;
+      border-radius: 4px;
       position: relative;
       overflow: hidden;
     }
-    .road-dashes-moving {
-      position: absolute; top: 50%; left: 0; right: -100%;
-      height: 4px;
-      background-image: linear-gradient(to right, white 50%, transparent 50%);
-      background-size: 80px 100%;
-      animation: moveRoad 0.4s linear infinite;
+    /* Passengers Silhouettes */
+    .passenger {
+      position: absolute; bottom: 0; left: 8px;
+      width: 18px; height: 20px;
+      background: #111;
+      border-radius: 10px 10px 0 0;
     }
-    @keyframes moveRoad {
-      from { transform: translateX(0); }
-      to { transform: translateX(-80px); }
+    .passenger::before {
+      content: ''; position: absolute; top: -8px; left: 3px;
+      width: 12px; height: 12px; background: #111; border-radius: 50%;
     }
+    .headlight {
+      position: absolute; bottom: 15px; right: 0;
+      width: 12px; height: 15px; background: #fff176;
+      border-radius: 0 5px 5px 0;
+      box-shadow: 25px 0 40px 15px rgba(255, 235, 59, 0.8);
+    }
+    .wheel {
+      position: absolute; bottom: -12px;
+      width: 32px; height: 32px; background: #222;
+      border: 4px solid #777; border-radius: 50%;
+      animation: spin 0.3s linear infinite;
+    }
+    .wheel.front { right: 25px; }
+    .wheel.back { left: 25px; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    /* Other Traffic (Overtaking Car) */
-    .traffic-car {
+    /* Proper Scaled Traffic Vehicles */
+    .traffic {
       position: absolute;
-      bottom: 4vh; left: -100px;
-      width: 120px; height: 40px;
-      background: #b30000;
-      border-radius: 10px 25px 5px 5px;
-      z-index: 35;
-      animation: overtake 12s linear infinite;
+      bottom: 25px;
+      z-index: 9;
+      animation: drive linear infinite;
     }
-    @keyframes overtake {
+    .car {
+      width: 90px; height: 35px; background: #0288d1;
+      border-radius: 10px 15px 3px 3px;
+    }
+    .auto {
+      width: 60px; height: 45px; background: #fbc02d;
+      border-radius: 5px 10px 0 0;
+    }
+    .bike {
+      width: 40px; height: 25px; background: #e65100;
+      border-radius: 5px;
+    }
+    @keyframes drive {
       0% { left: -150px; }
-      100% { left: 120vw; }
-    }
-    .car-light {
-      position: absolute; right: 0; top: 15px;
-      width: 10px; height: 10px; background: #ffffaa;
-      box-shadow: 20px 0 15px 5px rgba(255,255,150,0.8);
-      border-radius: 50%;
+      100% { left: 110vw; }
     }
 
-    /* Kanpuria Bus */
-    .bus-wrapper {
+    /* Top Compact Header & YouTube Player */
+    #top-bar {
       position: absolute;
-      bottom: 9vh; left: 12vw;
-      width: 340px; height: 120px;
-      background: linear-gradient(to bottom, #ffcc00 40%, #d32f2f 40%);
-      border-radius: 15px 40px 10px 10px;
-      z-index: 30;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+      top: 10px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      width: 92%; max-width: 420px;
+      background: rgba(10, 15, 25, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 15px;
+      padding: 10px 15px;
+      text-align: center;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.6);
     }
-    .bus-roof-luggage {
-      position: absolute; top: -18px; left: 30px;
-      display: flex; gap: 4px; z-index: 29;
+    h1.title {
+      font-size: 20px;
+      color: #fbc02d;
+      text-shadow: 0 0 10px rgba(251, 192, 45, 0.5);
+      margin-bottom: 8px;
     }
-    .luggage-item { height: 16px; border-radius: 3px; border: 1px solid #111; }
-    .lug1 { width: 30px; background: #8b4513; }
-    .lug2 { width: 22px; background: #2b4c7e; }
-    .lug3 { width: 40px; background: #556b2f; }
+    .horn-btn {
+      background: #d32f2f; color: #fff; border: none;
+      padding: 6px 14px; font-weight: bold; border-radius: 20px;
+      cursor: pointer; margin-bottom: 8px; font-size: 12px;
+      box-shadow: 0 4px 10px rgba(211, 47, 47, 0.4);
+    }
+    .horn-btn:active { transform: scale(0.95); }
 
-    .headlight-beam {
-      position: absolute; top: 60px; right: -220px;
-      width: 220px; height: 40px;
-      background: linear-gradient(to right, rgba(255,255,150,0.8), transparent);
-      clip-path: polygon(0 0, 100% -40%, 100% 140%, 0 100%);
+    /* Compact Embedded YouTube Player */
+    .yt-container {
+      width: 100%; height: 90px;
+      border-radius: 10px; overflow: hidden;
+      border: 1px solid #333;
     }
-    .bus-front-name {
-      position: absolute; bottom: 12px; left: 15px;
-      color: white; font-weight: 900; font-size: 1.1rem; letter-spacing: 2px;
-    }
-    .bus-windows-list {
-      position: absolute; top: 18px; left: 15px; right: 80px;
-      height: 35px; display: flex; gap: 6px;
-    }
-    .bus-win {
-      flex: 1; background-color: rgba(100,200,255,0.4);
-      border-radius: 4px; border: 2px solid #222;
-    }
-    .wheels-container {
-      position: absolute; bottom: -14px; left: 30px; right: 40px;
-      display: flex; justify-content: space-between;
-    }
-    .bus-wheel {
-      width: 40px; height: 40px; background-color: #111;
-      border: 4px solid #444; border-radius: 50%;
-      animation: spin 0.2s linear infinite;
-    }
+    iframe { width: 100%; height: 100%; border: none; }
 
-    /* Mobile Scaling */
-    @media (max-width: 600px) {
-      .brand-heading-hindi { font-size: 1.8rem; top: 40vh; }
-      .bus-wrapper { transform: scale(0.65); transform-origin: bottom left; left: 5vw; }
-      .top-player-card { width: 95%; top: 4.5rem; }
+    /* Overlay Start Screen */
+    #start-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(5, 5, 8, 0.95);
+      z-index: 100; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; text-align: center;
+    }
+    #start-overlay h2 { font-size: 28px; color: #fbc02d; margin-bottom: 10px; }
+    .start-btn {
+      padding: 12px 30px; font-size: 18px; font-weight: bold;
+      color: #fff; background: linear-gradient(45deg, #ff416c, #ff4b2b);
+      border: none; border-radius: 30px; cursor: pointer;
+      box-shadow: 0 5px 20px rgba(255, 75, 43, 0.5);
     }
   </style>
 </head>
 <body>
 
-  <!-- Start Engine Overlay -->
+  <!-- Overlay Screen -->
   <div id="start-overlay">
-    <h1 style="color: #ffcc00; margin-bottom: 5px;">कानपुरिया रोडवेज Express</h1>
-    <p style="color: #ccc; font-size: 0.9rem;">सफर शुरू करने के लिए नीचे बटन दबाएं</p>
+    <h2>कानपुरिया रोडवेज Express</h2>
+    <p style="margin-bottom:20px; color:#aaa;">तूफानी सफर शुरू करने के लिए बटन दबाएं</p>
     <button class="start-btn" onclick="startJourney()">START JOURNEY (चालू करें)</button>
   </div>
 
-  <div id="lightning-flash" class="lightning-flash"></div>
-  <div class="rain-canvas" id="rain-canvas"></div>
+  <!-- Environment Elements -->
+  <div id="sky"></div>
+  <div id="lightning"></div>
+  <div id="rain-canvas"></div>
 
-  <!-- Sky Banner -->
-  <div class="cloud-banner">
-    <div class="dipping-cloud dc1"></div>
-    <div class="dipping-cloud dc2"></div>
-    <div class="airplane-wrapper">
-      <svg width="120" height="40" viewBox="0 0 150 50" style="transform: scaleX(-1)">
-        <path d="M10,25 L-80,60 L-80,-10 Z" fill="rgba(255,255,255,0.3)"></path>
-        <path d="M20,25 L120,25 Q140,25 145,20 L145,20 Q140,15 120,15 L20,15 Z" fill="#fff"></path>
-        <circle cx="10" cy="20" r="3" fill="#ffffff" class="plane-light"></circle>
-      </svg>
-    </div>
+  <!-- Trees -->
+  <div class="tree-line">
+    <div class="tree"></div><div class="tree"></div>
+    <div class="tree"></div><div class="tree"></div>
+    <div class="tree"></div><div class="tree"></div>
   </div>
 
-  <!-- Top Controls -->
-  <div class="top-nav">
-    <div class="live-status">
-      <span class="green-dot"></span>
-      <span>KANPUR EXPRESSWAY</span>
+  <!-- Road & Bus -->
+  <div id="road">
+    <div class="lane-mark" style="top:30%;"></div>
+    <div class="lane-mark" style="top:70%;"></div>
+    
+    <!-- Kanpuria Bus with Passengers -->
+    <div class="bus">
+      <div class="bus-top"></div>
+      <div class="windows">
+        <div class="window"><div class="passenger"></div></div>
+        <div class="window"><div class="passenger"></div></div>
+        <div class="window"><div class="passenger"></div></div>
+        <div class="window"><div class="passenger"></div></div>
+      </div>
+      <div class="headlight"></div>
+      <div class="wheel back"></div>
+      <div class="wheel front"></div>
     </div>
-    <button class="horn-trigger-btn" onclick="playPoPoHorn()">
-      🎺 BASS HORN (पो-पो)
-    </button>
+
+    <!-- Dynamic Traffic Container -->
+    <div id="traffic-container"></div>
   </div>
 
-  <!-- Music Player Card -->
-  <div class="top-player-card">
-    <div style="display: flex; align-items: center; gap: 10px; flex: 1; overflow: hidden;">
-      <div id="disc-art" class="disc-art" style="animation-play-state: paused;">🎵</div>
-      <div style="display: flex; flex-direction: column; overflow: hidden;">
-        <span id="song-title-text" style="font-weight: bold; font-size: 0.85rem; white-space: nowrap;">कानपुरिया DJ हिट्स</span>
-        <span id="song-artist-text" style="font-size: 0.7rem; color: #aaa;">Desi Express Beats</span>
-      </div>
-    </div>
-    <div style="display: flex; gap: 10px;">
-      <button style="background:none; border:none; color:white; cursor:pointer;" onclick="prevSong()">⏮</button>
-      <button id="btn-play-main" style="background:none; border:none; color:white; cursor:pointer; font-size: 1.3rem;" onclick="togglePlay()">▶</button>
-      <button style="background:none; border:none; color:white; cursor:pointer;" onclick="nextSong()">⏭</button>
+  <!-- Header & Compact YouTube Music Player -->
+  <div id="top-bar">
+    <h1 class="title">कानपुरिया रोडवेज</h1>
+    <button class="horn-btn" onclick="playPoPoHorn()">🔊 BASS HORN (पो-पो)</button>
+    
+    <!-- Youtube Player Playlist embedded -->
+    <div class="yt-container">
+      <iframe src="https://www.youtube.com/embed/videoseries?list=PLq-bT4s33RYADNkcClDkLPovaKJx0HTDM&autoplay=1" allow="autoplay"></iframe>
     </div>
   </div>
-
-  <!-- Brand Name -->
-  <div class="brand-heading-hindi">KANPURIA ROADWAYS</div>
-
-  <!-- Scenery Viewport -->
-  <div class="viewport-scenery">
-
-    <!-- Background Buildings -->
-    <div class="buildings-layer">
-      <div class="building-group">
-        <div class="bld" style="width: 50px; height: 120px;"><div class="bld-win"></div><div class="bld-win"></div></div>
-        <div class="bld" style="width: 70px; height: 160px;"><div class="bld-win"></div><div class="bld-win"></div></div>
-        <div class="bld" style="width: 40px; height: 90px;"><div class="bld-win"></div></div>
-      </div>
-    </div>
-
-    <!-- Trees Layer -->
-    <div class="trees-layer">
-      <div class="tree"><div class="tree-trunk"></div></div>
-      <div class="tree"><div class="tree-trunk"></div></div>
-      <div class="tree"><div class="tree-trunk"></div></div>
-    </div>
-
-    <!-- Highway Sign Board -->
-    <div class="highway-sign-wrapper">
-      <div class="sign-board-rect">
-        <span>कानपुर -> 45 KM</span>
-      </div>
-      <div style="display: flex; gap: 50px;">
-        <div class="pole-stick"></div>
-        <div class="pole-stick"></div>
-      </div>
-    </div>
-
-    <!-- Traffic Light Signal -->
-    <div class="traffic-signal">
-      <div class="signal-box">
-        <div class="sig-light sig-red"></div>
-        <div class="sig-light sig-yellow"></div>
-        <div class="sig-light sig-green"></div>
-      </div>
-      <div class="pole-stick" style="height: 60px;"></div>
-    </div>
-
-    <!-- Bus Structure -->
-    <div class="bus-wrapper">
-      <div class="bus-roof-luggage">
-        <div class="luggage-item lug1"></div>
-        <div class="luggage-item lug2"></div>
-        <div class="luggage-item lug3"></div>
-      </div>
-      <div class="headlight-beam"></div>
-      <div class="bus-front-name">KANPURIA</div>
-      <div class="bus-windows-list">
-        <div class="bus-win"></div>
-        <div class="bus-win"></div>
-        <div class="bus-win"></div>
-      </div>
-      <div class="wheels-container">
-        <div class="bus-wheel"></div>
-        <div class="bus-wheel"></div>
-      </div>
-    </div>
-
-    <!-- Road Track and Cars -->
-    <div class="road-strip">
-      <div class="road-dashes-moving"></div>
-      <div class="traffic-car">
-        <div class="car-light"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Audio Elements -->
-  <audio id="main-audio" loop></audio>
 
   <script>
-    // Generate Rain Drops
+    // Generate Heavy Rain
     const rainContainer = document.getElementById('rain-canvas');
-    for (let i = 0; i < 35; i++) {
+    for (let i = 0; i < 120; i++) {
       const drop = document.createElement('div');
       drop.className = 'drop';
       drop.style.left = Math.random() * 100 + 'vw';
-      drop.style.animationDuration = (Math.random() * 0.4 + 0.4) + 's';
+      drop.style.animationDuration = (Math.random() * 0.3 + 0.3) + 's';
       drop.style.animationDelay = (Math.random() * 2) + 's';
       rainContainer.appendChild(drop);
     }
 
-    // Lightning Flash & Synthesized Thunder Sound Effect
+    // Heavy Thunder & Flash
     setInterval(() => {
-      if (Math.random() > 0.6) {
-        const flash = document.getElementById('lightning-flash');
-        flash.classList.add('flash-active');
+      if (Math.random() > 0.5) {
+        const flash = document.getElementById('lightning');
+        flash.classList.add('flash');
         playThunderSound();
-        setTimeout(() => flash.classList.remove('flash-active'), 600);
+        setTimeout(() => flash.classList.remove('flash'), 120);
       }
-    }, 7000);
+    }, 4000);
 
-    // Audio Songs Playlist
-    const playlist = [
-      { title: "कानपुरिया डीजे मिक्स 01", artist: "DJ Kanpur Express", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-      { title: "नाइट एक्सप्रेस बीट 02", artist: "Express Highway Beats", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-      { title: "देसी बस स्पेशल 03", artist: "UP Highway DJ", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" }
-    ];
-
-    let currentTrack = 0;
-    const audio = document.getElementById('main-audio');
-    const discArt = document.getElementById('disc-art');
-    const playBtn = document.getElementById('btn-play-main');
-    let isPlaying = false;
-
-    function loadTrack(index) {
-      audio.src = playlist[index].src;
-      document.getElementById('song-title-text').innerText = playlist[index].title;
-      document.getElementById('song-artist-text').innerText = playlist[index].artist;
+    // Spawn Traffic Cars, Autos, Bikes
+    function spawnTraffic() {
+      const container = document.getElementById('traffic-container');
+      const types = ['car', 'auto', 'bike'];
+      const chosen = types[Math.floor(Math.random() * types.length)];
+      
+      const vehicle = document.createElement('div');
+      vehicle.className = `traffic ${chosen}`;
+      vehicle.style.animationDuration = (Math.random() * 3 + 4) + 's';
+      
+      container.appendChild(vehicle);
+      setTimeout(() => vehicle.remove(), 7000);
     }
-    loadTrack(currentTrack);
+    setInterval(spawnTraffic, 3500);
 
-    // Start Everything on User Interaction (Bypasses Browser Restrictions)
+    // Start Journey Function
     function startJourney() {
       document.getElementById('start-overlay').style.display = 'none';
-      togglePlay();
       playPoPoHorn();
     }
 
-    function togglePlay() {
-      if (isPlaying) {
-        audio.pause();
-        playBtn.innerText = "▶";
-        discArt.style.animationPlayState = "paused";
-        isPlaying = false;
-      } else {
-        audio.play().then(() => {
-          playBtn.innerText = "⏸";
-          discArt.style.animationPlayState = "running";
-          isPlaying = true;
-        }).catch(err => console.log(err));
-      }
-    }
-
-    function nextSong() {
-      currentTrack = (currentTrack + 1) % playlist.length;
-      loadTrack(currentTrack);
-      if (isPlaying) audio.play();
-    }
-
-    function prevSong() {
-      currentTrack = (currentTrack - 1 + playlist.length) % playlist.length;
-      loadTrack(currentTrack);
-      if (isPlaying) audio.play();
-    }
-
-    // Horn Sound Generator (Po-Po)
+    // Horn Sound Generator
     function playPoPoHorn() {
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -626,7 +352,7 @@
       } catch(e){}
     }
 
-    // Thunder Rumble Sound Generator
+    // Thunder Sound Generator
     function playThunderSound() {
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -646,5 +372,3 @@
   </script>
 </body>
 </html>
-
-
